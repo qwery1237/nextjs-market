@@ -4,9 +4,33 @@ import {
   PASSWORD_REGEX,
   PASSWORD_REGEX_ERROR,
 } from '@/lib/constants';
+import db from '@/lib/db';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
+import { saveSassionIdAndRedirect } from '@/lib/session';
 
-const checkUsername = (username: string) => !username.includes('potato');
+const checkUsername = async (username: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return !user;
+};
+const checkEmail = async (email: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return !user;
+};
 const checkPasswords = ({
   password,
   confirmPassword,
@@ -23,8 +47,12 @@ const formSchema = z
       })
       .toLowerCase()
       .trim()
-      .refine(checkUsername, 'No potatoes allowed'),
-    email: z.string().email().toLowerCase(),
+      .refine(checkUsername, 'This username is already taken!'),
+    email: z
+      .string()
+      .email()
+      .toLowerCase()
+      .refine(checkEmail, 'This email is already taken!'),
     password: z
       .string()
       .min(PASSWORD_MIN_LENGTH)
@@ -42,10 +70,26 @@ export async function createAccount(prevState: any, formData: FormData) {
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
   };
-  const { success, error, data: result } = formSchema.safeParse(data);
+  const {
+    success,
+    error,
+    data: result,
+  } = await formSchema.safeParseAsync(data);
   if (!success) {
     return error.flatten();
   } else {
-    console.log(result);
+    const hashedPassword = await bcrypt.hash(result.password, 12);
+    const user = await db.user.create({
+      data: {
+        username: result.username,
+        email: result.email,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+      },
+    });
+    await saveSassionIdAndRedirect(user.id, '/profile');
+    return;
   }
 }

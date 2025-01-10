@@ -1,13 +1,13 @@
 'use client';
 import SocialLogin from '@/components/social-login';
-import { useFormState } from 'react-dom';
 import { createAccount } from './actions';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import { PASSWORD_MIN_LENGTH } from '@/lib/constants';
+import { useActionState } from 'react';
 
 export default function CreateAccount() {
-  const [state, dispatch] = useFormState(createAccount, null);
+  const [state, dispatch] = useActionState(createAccount, null);
   return (
     <div className='flex flex-col gap-10 py-8 px-6'>
       <div className='flex flex-col gap-2 *:font-medium'>
