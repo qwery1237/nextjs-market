@@ -24,6 +24,8 @@ export default function SMSLogin() {
             type='number'
             placeholder='Verification code'
             required
+            min={100000}
+            max={999999}
             errors={state.error?.formErrors}
           />
         ) : (
@@ -32,8 +34,6 @@ export default function SMSLogin() {
             type='text'
             placeholder='Phone number'
             required
-            min={100000}
-            max={999999}
             errors={state.error?.formErrors}
           />
         )}
