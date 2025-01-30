@@ -82,15 +82,15 @@ export async function smsLogin(prevState: ActionState, formData: FormData) {
           },
         },
       });
-      const client = twilio(
-        process.env.TWILIO_SID,
-        process.env.TWILIO_AUTH_TOKEN
-      );
-      await client.messages.create({
-        body: `Your Karrot verification code is: ${token}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: process.env.TWILIO_VERIFIED_PHONE_NUMBER!,
-      });
+      // const client = twilio(
+      //   process.env.TWILIO_SID,
+      //   process.env.TWILIO_AUTH_TOKEN
+      // );
+      // await client.messages.create({
+      //   body: `Your Karrot verification code is: ${token}`,
+      //   from: process.env.TWILIO_PHONE_NUMBER,
+      //   to: process.env.TWILIO_VERIFIED_PHONE_NUMBER!,
+      // });
       return {
         token: true,
         phone,
